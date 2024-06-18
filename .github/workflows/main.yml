@@ -18,20 +18,25 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2 # Specify your AWS region
+          aws-region: us-east-2 
 
       - name: Launch EC2 instance
         id: launch_ec2
         run: |
           USER_DATA=$(base64 -w 0 <<EOF
           #!/bin/bash
-          cd  simple-strapi-update
-          yarn develop
+          sudo apt update
+          curl -fsSL https://deb.nodesource.com/setup_20.x -o nodesource_setup.sh && bash -E nodesource_setup.sh
+          sudo apt install nodejs -y && npm install -g yarn
+          echo -e "skip\n" | npx create-strapi-app strapi-app --quickstart
+          EOF
+          )
+
           EOF
           )
           
           INSTANCE_ID=$(aws ec2 run-instances \
-            --image-id ami-0ded9b2a3052c1db0 \
+            --image-id ami-0f30a9c3a48f3fa79 \
             --instance-type t2.medium \
             --key-name strapi_key2 \
             --security-group-ids sg-06f745d55fc21eaa1 \
@@ -46,5 +51,5 @@ jobs:
           aws ec2 wait instance-running --instance-ids $INSTANCE_ID
       - name: Wait for user data script to finish
         run: |
-          sleep 200  # Wait time for the user data script to finish execution. Adjust as needed.
+          sleep 220  
           
