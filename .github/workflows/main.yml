@@ -32,8 +32,7 @@ jobs:
           EOF
           )
 
-          EOF
-          )
+          
           
           INSTANCE_ID=$(aws ec2 run-instances \
             --image-id ami-0f30a9c3a48f3fa79 \
